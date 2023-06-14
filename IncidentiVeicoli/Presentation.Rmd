@@ -1,0 +1,64 @@
+---
+title: "Incidenti stradali in Italia"
+author: "Matteo Cancian"
+date: "26 Giugno 2023"
+output: 
+  ioslides_presentation: 
+    widescreen: true
+    css: 'styles.css'
+    
+---
+
+
+## Introduzione e domande
+
+Ho scelto di fare questa analisi per analizzare gli incidenti stradali in Italia.\
+Mi sono chiesto infatti quali variabili potesssero incidere positivamente o negativamente sulle possibilità di fare un incidente:
+
+-   Il tipo di strada percorsa incide su determinati tipi di incidenti?
+
+-   La localizzazione geografica incide sulle possibilità di incidente?
+
+-   Il tipo o colore del veicolo varia le possibilità di incidenti?
+
+-   Gli incidenti sono rapportati alla popolazione o al parco veicolare dell'area geografica?
+
+-   Ci sono più possibilità di fare un incidente ad una certa ora del giorno?
+
+-   Ci sono più possibilità di fare incidenti certi giorni piuttosto che altri?
+
+
+
+## Raccolta dati e dataset
+
+Ho analizzato i dataset disponibili su internet di varie organizzazioni (ISTAT, MIT, ACI, OECD...).
+Alla fine ho deciso di prendere i dati dall'ISTAT dove erano più completi e affidabili.
+
+Ho estrapolato vari dataset di dimensione molto variabile (da decine di righe a centinaia di migliaia).
+
+<!-- qui aggiungici qualche immagine -->
+
+
+
+## Incidenti per regione in rapporto alla popolazione
+
+```{r, echo=FALSE, message=FALSE}
+
+source("IncidentiPopolazione.R")
+
+ggplot(data = RapportoIncidentiPopolazione, mapping = aes(x = Territorio, y = IncidentiPerMilleAbitanti, color = Anno)) +
+  geom_point() + 
+  theme(axis.text.x=element_text(angle=60, hjust=1, vjust=0.5, margin = margin(t = -50, r = 0, b = 0, l = 0, unit = "pt")))
+```
+
+
+
+
+```{r, echo=FALSE, message=FALSE}
+ggplot(data = RapportoIncidentiPopolazione %>% filter(Anno==2021), mapping = aes(x = nPopolazione, y = nIncidenti)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10() +
+  geom_smooth(se = FALSE)
+```
+
