@@ -7,10 +7,9 @@ output:
     widescreen: true
     slide_width: 1600
     slide_height: 900
-    css: 'styles.css'
     
 ---
-
+<style> slides > slide { overflow: auto; }</style>
 
 ## Introduzione e domande
 
@@ -45,20 +44,19 @@ CI ho tolto tutte le cose inutili e li ho adattati alle mie necessità.
 
 ## Incidenti in rapporto alla popolazione per regione
 
-```{r, echo=FALSE, message=FALSE}
+```{r, fig.width=9, fig.height=6, echo=FALSE, message=FALSE}
 source("ImportTidyTransform.R")
-
 source("ggplotIncidentiPopolazione.R")
 
 ggplot(data = RapportoIncidentiPopolazione, mapping = aes(x = Territorio, y = IncidentiPerMlnAbitanti, color = Anno)) +
   geom_point() + 
-  theme(axis.text.x=element_text(angle=60, hjust=1, vjust=0.5, margin = margin(t = -50, r = 0, b = 0, l = 0, unit = "pt")))
+  theme(axis.text.x=element_text(angle=45, hjust=1, vjust=0.5, margin = margin(t = -40, r = 0, b = 40, l = 0, unit = "pt")))
 ```
 
 
 
 
-```{r, echo=FALSE, message=FALSE}
+```{r, fig.width=9, fig.height=7, echo=FALSE, message=FALSE}
 ggplot(data = RapportoIncidentiPopolazione %>% filter(Anno==2021), mapping = aes(x = nPopolazione, y = nIncidenti)) +
   geom_point() +
   scale_x_log10() +
@@ -68,9 +66,9 @@ ggplot(data = RapportoIncidentiPopolazione %>% filter(Anno==2021), mapping = aes
 
 
 
-## Mappa incidenti in rapporto alla popolazione per provincia 
+## Mappa incidenti in rapporto alla popolazione per provincia nel 2021
 
-```{r, fig.width=7, fig.height=7, echo=FALSE, message=FALSE}
+```{r, fig.width=8, fig.height=8, echo=FALSE, message=FALSE}
 source("MapProvIncidentiPopolazione.R")
 
 # Disegna la mappa con i colori
@@ -83,7 +81,7 @@ source("MapProvIncidentiPopolazione.R")
 
 
 
-## Incidenti in rapporto al parco veicolare per regione
+## Incidenti in rapporto al parco veicolare per regione nel 2021
 
 ```{r, echo=FALSE, message=FALSE}
 source("ggplotIncidentiParcoveicolare.R")
@@ -96,10 +94,9 @@ ggplot(data = RapportoIncidentiVeicoli %>% filter(TIME==2021), mapping = aes(x =
 ```
 
 
+## Mappa incidenti in rapporto al parco veicolare per provincia nel 2021
 
-## Mappa incidenti in rapporto al parco veicolare per provincia 
-
-```{r, fig.width=7, fig.height=7, echo=FALSE, message=FALSE}
+```{r, fig.width=8, fig.height=8, echo=FALSE, message=FALSE}
 source("MapProvIncidentiParcoveicolare.R")
 
 # Disegna la mappa con i colori
@@ -110,3 +107,43 @@ source("MapProvIncidentiParcoveicolare.R")
    guides(color = guide_colorbar(title = "Valore"))
 ```
 
+
+
+## Quantità di incidenti per fascia oraria
+### Somma dei valori di tutti gli anni dal 2001 al 2021
+
+```{r, fig.width=8, fig.height=7, echo=FALSE, message=FALSE}
+# crea grafico con gli incidenti nelle varie fasce orarie (somma di tutti gli anni dal 2001 al 2021)
+ggplot(data = IncidentiPerOrarioItalia %>% select(Territorio, ORA, Value) %>% group_by(ORA), 
+       mapping = aes(x = ORA, y = Value)) +
+  geom_col() +
+  xlab("Fascia oraria") +
+  ylab("Numero incidenti")
+```
+
+
+
+### Negli anni 2001, 2011 e 2021
+
+```{r, fig.width=8, fig.height=7, echo=FALSE, message=FALSE}
+# Crea grafico con gli incidenti nelle varie fascie orarie filtrati per i tre anni simbolici (2001, 2011, 2021)
+ggplot(data = IncidentiPerOrarioItalia %>% filter(TIME %in% c(2001, 2011, 2021)), 
+       mapping = aes(x = ORA, y = Value, color = TIME)) +
+  geom_point()
+```
+
+
+
+## Quantità di incidenti per giorno della settimana (somma di tutti gli anni dal 2001 al 2021)
+
+```{r, fig.width=8, fig.height=7, echo=FALSE, message=FALSE}
+# Riordina i giorni della settimana nel modo desiderato
+IncidentiPerGiornoItalia$Giorno.della.settimana = factor(IncidentiPerGiornoItalia$Giorno.della.settimana, levels = c("lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"))
+
+# Crea grafico con gli incidenti nei vari giorni della settimana (somma di tutti gli anni dal 2001 al 2021)
+ggplot(data = IncidentiPerGiornoItalia %>% select(Territorio, Giorno.della.settimana, Value) %>% group_by(Giorno.della.settimana), 
+       mapping = aes(x = Giorno.della.settimana, y = Value)) +
+  geom_col() +
+  xlab("Giorno della settimana") +
+  ylab("Numero incidenti")
+```

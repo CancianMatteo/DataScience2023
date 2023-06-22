@@ -117,6 +117,33 @@ IncidentiConVeicoliProvince = adattaProvinceMap(IncidentiConVeicoliProvince)
 
 
 
+# importo i dataset degli incidenti in italia per l'analisi dei tempi (fasce orarie e giorni)
+incidenti_stradali = read.csv("/Users/matteocancian/Documents/UNIUD/1° ANNO/DATA SCIENCE/Incidenti d'auto/ISTAT_CSV/incidenti_stradali_tempi_2001-2021.csv")
+
+IncidentiPerOrarioItalia = incidenti_stradali %>%
+  filter(Territorio == "Italia",
+         Localizzazione.dell.incidente == "totale",   # Filtra solo il totale (tutti indipendentemente dal tipo di strada)
+         Intersezione == "totale",
+         Natura.dell.incidente == "totale",           # Filtra solo i dati di tutti gli incidenti senza distinzione di tipo
+         Incidente.mortale == "totale",
+         ORA != 99,
+         ORA != 25,
+         Giorno.della.settimana == "totale",
+         Mese == "totale") %>%                        # Filtra solo i dati annuali
+  select(Territorio, ORA, TIME, Value)
+
+IncidentiPerGiornoItalia  = incidenti_stradali %>%
+  filter(Territorio == "Italia",
+         Localizzazione.dell.incidente == "totale",   # Filtra solo il totale (tutti indipendentemente dal tipo di strada)
+         Intersezione == "totale",
+         Natura.dell.incidente == "totale",           # Filtra solo i dati di tutti gli incidenti senza distinzione di tipo
+         Incidente.mortale == "totale",
+         ORA == 99,
+         Giorno.della.settimana != "totale",
+         Mese == "totale") %>%                        # Filtra solo i dati annuali
+  select(Territorio, Giorno.della.settimana, TIME, Value)
+
+
 # Importa la popolazione residente
 popolazione_residente_2001 = read.csv("/Users/matteocancian/Documents/UNIUD/1° ANNO/DATA SCIENCE/Incidenti d'auto/ISTAT_CSV/Popolazione_residente_regioni_2001.csv")
 popolazione_residente_2011 = read.csv("/Users/matteocancian/Documents/UNIUD/1° ANNO/DATA SCIENCE/Incidenti d'auto/ISTAT_CSV/Popolazione_residente_regioni_2011.csv")
