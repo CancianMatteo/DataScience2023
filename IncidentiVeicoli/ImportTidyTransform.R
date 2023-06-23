@@ -130,7 +130,7 @@ IncidentiPerOrarioItalia = incidenti_stradali %>%
          ORA != 25,
          Giorno.della.settimana == "totale",
          Mese == "totale") %>%                        # Filtra solo i dati annuali
-  select(Territorio, ORA, TIME, Value)
+  select(ORA, TIME, Value)
 
 IncidentiPerGiornoItalia  = incidenti_stradali %>%
   filter(Territorio == "Italia",
@@ -141,7 +141,91 @@ IncidentiPerGiornoItalia  = incidenti_stradali %>%
          ORA == 99,
          Giorno.della.settimana != "totale",
          Mese == "totale") %>%                        # Filtra solo i dati annuali
-  select(Territorio, Giorno.della.settimana, TIME, Value)
+  select(Giorno.della.settimana, TIME, Value)
+
+IncidentiPerMeseItalia  = incidenti_stradali %>%
+  filter(Territorio == "Italia",
+         Localizzazione.dell.incidente == "totale",   # Filtra solo il totale (tutti indipendentemente dal tipo di strada)
+         Intersezione == "totale",
+         Natura.dell.incidente == "totale",           # Filtra solo i dati di tutti gli incidenti senza distinzione di tipo
+         Incidente.mortale == "totale",
+         ORA == 99,
+         Giorno.della.settimana == "totale",
+         Mese != "totale") %>%                        # Filtra tutto tranne i dati annuali
+  select(Mese, TIME, Value)
+
+
+
+# importo i dataset degli incidenti in italia per l'analisi dei tpi di strade
+incidenti_stradali_localizzazioni = read.csv("/Users/matteocancian/Documents/UNIUD/1° ANNO/DATA SCIENCE/Incidenti d'auto/ISTAT_CSV/incidenti_stradali_localizzazioni_2001-2021.csv")
+
+# creo un dataset che ha due colonne, una con i tipi di strada e una con il numero di incidenti che vi sono accaduti tra il 2001 e il 2021
+IncidentiPerTipoStradaItalia = incidenti_stradali_localizzazioni %>%
+  filter(Territorio == "Italia",
+         Localizzazione.dell.incidente != "totale",   # Filtra tutti i tipi di strada tranne il totale
+         Intersezione == "totale",
+         Natura.dell.incidente == "totale",           # Filtra solo i dati di tutti gli incidenti senza distinzione di tipo
+         Incidente.mortale == "totale",
+         ORA == 99,
+         Giorno.della.settimana == "totale",
+         Mese == "totale") %>%
+  select(Localizzazione.dell.incidente, Value) %>% 
+  group_by(Localizzazione.dell.incidente)  %>%
+  summarise(Valori = sum(Value)) %>%
+  mutate(Localizzazione.dell.incidente = stringr::str_replace(Localizzazione.dell.incidente, "altra strada", "strada extraurbana e altro"))
+
+# calcolo il totale degli incidenti in italia tra 2001 e 2021
+TotaleIncidentiItalia = sum(IncidentiPerTipoStradaItalia$Valori)
+
+# creo una colonna analoga a quella dei valori, ma in percentuale
+IncidentiPerTipoStradaItalia = IncidentiPerTipoStradaItalia %>%
+  mutate( ValoriPercentuali =  round(IncidentiPerTipoStradaItalia$Valori/TotaleIncidentiItalia*100, digits=2))
+
+
+# creo un dataset che ha due colonne, una con i tipi intersezione (luogo incidente) 
+          # e una con il numero di incidenti che vi sono accaduti tra il 2001 e il 2021 in valore assoluto e percentuale
+IncidentiPerIntersezioneItalia = incidenti_stradali_localizzazioni %>%
+  filter(Territorio == "Italia",
+         Localizzazione.dell.incidente == "totale",   # Filtra tutti i tipi di strada tranne il totale
+         Intersezione != "totale",
+         Natura.dell.incidente == "totale",           # Filtra solo i dati di tutti gli incidenti senza distinzione di tipo
+         Incidente.mortale == "totale",
+         ORA == 99,
+         Giorno.della.settimana == "totale",
+         Mese == "totale") %>%
+  select(Intersezione, Value) %>%
+  # * altro è un dato cumulativo di: rotatoria, dosso, pendenza, strettoia, galleria, passaggio a livello...
+  mutate(Intersezione = stringr::str_replace(Intersezione, "dosso - pendenza - strettoia", "altro*")) %>%
+  mutate(Intersezione = stringr::str_replace(Intersezione, "galleria", "altro*")) %>%
+  mutate(Intersezione = stringr::str_replace(Intersezione, "passaggio a livello", "altro*")) %>%
+  mutate(Intersezione = stringr::str_replace(Intersezione, "rotatoria", "altro*")) %>%
+  group_by(Intersezione) %>%
+  summarise(Valori = sum(Value))
+  
+# creo una colonna analoga a quella dei valori, ma in percentuale
+IncidentiPerIntersezioneItalia = IncidentiPerIntersezioneItalia %>%
+  mutate( ValoriPercentuali =  round(IncidentiPerIntersezioneItalia$Valori/TotaleIncidentiItalia*100, digits=2))
+
+
+# creo un dataset che ha due colonne, una con i tipi di natura degli incidenti
+# e una con il numero di incidenti che vi sono accaduti tra il 2001 e il 2021 in valore assoluto e percentuale
+IncidentiPerNaturaItalia = incidenti_stradali_localizzazioni %>%
+  filter(Territorio == "Italia",
+         Localizzazione.dell.incidente == "totale",   # Filtra tutti i tipi di strada tranne il totale
+         Intersezione == "totale",
+         Natura.dell.incidente != "totale",           # Filtra solo i dati di tutti gli incidenti senza distinzione di tipo
+         Incidente.mortale == "totale",
+         ORA == 99,
+         Giorno.della.settimana == "totale",
+         Mese == "totale") %>%
+  select(Natura.dell.incidente, Value) %>% 
+  group_by(Natura.dell.incidente)  %>%
+  summarise(Valori = sum(Value))
+
+# creo una colonna analoga a quella dei valori, ma in percentuale
+IncidentiPerNaturaItalia = IncidentiPerNaturaItalia %>%
+  mutate( ValoriPercentuali =  round(IncidentiPerNaturaItalia$Valori/TotaleIncidentiItalia*100, digits=2))
+
 
 
 # Importa la popolazione residente

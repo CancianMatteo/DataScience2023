@@ -15,8 +15,4 @@ ggplot(data = RapportoIncidentiPopolazione, mapping = aes(x = Territorio, y = In
 
 ggplot(data = RapportoIncidentiPopolazione, mapping = aes(x = nPopolazione, y = nIncidenti, color = Anno)) +
   geom_point() + 
-  geom_smooth(se = FALSE)
-
-#ggplot(data = RapportoIncidentiPopolazione, mapping = aes(x = nPopolazione, y = nIncidenti, color = Anno)) +
-#  geom_histogram() + 
-#  geom_smooth(se = FALSE)
+  geom_smooth(se = TRUE)
