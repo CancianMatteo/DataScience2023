@@ -14,5 +14,6 @@ ggplot(data = RapportoIncidentiPopolazione, mapping = aes(x = Territorio, y = In
   theme(axis.text.x=element_text(angle=60, hjust=1, vjust=0.5, margin = margin(t = -50, r = 0, b = 0, l = 0, unit = "pt")))
 
 ggplot(data = RapportoIncidentiPopolazione, mapping = aes(x = nPopolazione, y = nIncidenti, color = Anno)) +
-  geom_point() + 
+  geom_point() +
+  geom_text(aes(label = Territorio), nudge_y = 0.2) + # Add the labels
   geom_smooth(se = TRUE)

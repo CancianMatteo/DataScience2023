@@ -26,4 +26,5 @@ ggplot(data = IncidentiPerNaturaItalia, aes(x = "", y = ValoriPercentuali, fill 
   geom_bar(stat = "identity", width = 1) +
   coord_polar("y", start = 0) +
   theme_void() +
+  labs(fill = "Natura dell'incidente") +
   geom_text(aes(label = ValoriPercentuali), position = position_stack(vjust = 0.5))

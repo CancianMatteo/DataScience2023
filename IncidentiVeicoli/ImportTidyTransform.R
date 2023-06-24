@@ -132,6 +132,9 @@ IncidentiPerOrarioItalia = incidenti_stradali %>%
          Mese == "totale") %>%                        # Filtra solo i dati annuali
   select(ORA, TIME, Value)
 
+IncidentiPerOrarioItalia = rename(IncidentiPerOrarioItalia, Anno = TIME)
+
+
 IncidentiPerGiornoItalia  = incidenti_stradali %>%
   filter(Territorio == "Italia",
          Localizzazione.dell.incidente == "totale",   # Filtra solo il totale (tutti indipendentemente dal tipo di strada)
@@ -143,6 +146,9 @@ IncidentiPerGiornoItalia  = incidenti_stradali %>%
          Mese == "totale") %>%                        # Filtra solo i dati annuali
   select(Giorno.della.settimana, TIME, Value)
 
+IncidentiPerGiornoItalia = rename(IncidentiPerGiornoItalia, Anno = TIME)
+
+
 IncidentiPerMeseItalia  = incidenti_stradali %>%
   filter(Territorio == "Italia",
          Localizzazione.dell.incidente == "totale",   # Filtra solo il totale (tutti indipendentemente dal tipo di strada)
@@ -153,6 +159,8 @@ IncidentiPerMeseItalia  = incidenti_stradali %>%
          Giorno.della.settimana == "totale",
          Mese != "totale") %>%                        # Filtra tutto tranne i dati annuali
   select(Mese, TIME, Value)
+
+IncidentiPerMeseItalia = rename(IncidentiPerMeseItalia, Anno = TIME)
 
 
 

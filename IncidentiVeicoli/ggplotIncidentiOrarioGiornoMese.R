@@ -8,19 +8,13 @@ ggplot(data = IncidentiPerOrarioItalia %>% select(ORA, Value) %>% group_by(ORA),
   xlab("Fascia oraria") +
   ylab("Numero incidenti")
 # Crea grafico con gli incidenti nelle varie fascie orarie filtrati per i tre anni simbolici (2001, 2011, 2021)
-ggplot(data = IncidentiPerOrarioItalia %>% filter(TIME %in% c(2001, 2011, 2021)), 
-       mapping = aes(x = ORA, y = Value, color = TIME)) +
+ggplot(data = IncidentiPerOrarioItalia %>% filter(Anno %in% c(2001, 2011, 2021)), 
+       mapping = aes(x = ORA, y = Value, color = Anno)) +
   geom_point() +
   xlab("Fascia oraria") +
   ylab("Numero incidenti")
 
 
-# Riordina i giorni della settimana nel modo desiderato
-#IncidentiPerGiornoItalia$Giorno.della.settimana = factor(IncidentiPerGiornoItalia$Giorno.della.settimana, levels = c("lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"))
-#IncidentiPerGiornoItalia = IncidentiPerGiornoItalia %>% 
-#  select(Giorno.della.settimana, Value) %>% 
-#  group_by(Giorno.della.settimana) %>%
-#  summarise(Valori = sum(Value))
 
 # Riordina i giorni della settimana nel modo desiderato
 IncidentiPerGiornoItalia$Giorno.della.settimana = factor(IncidentiPerGiornoItalia$Giorno.della.settimana, levels = c("lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"))
@@ -31,6 +25,7 @@ ggplot(data = IncidentiPerGiornoItalia %>% select(Giorno.della.settimana, Value)
   geom_col(fill = "orange") +
   xlab("Giorno della settimana") +
   ylab("Numero incidenti")
+
 
 
 # Riordina i mesi nel modo desiderato
@@ -44,8 +39,8 @@ ggplot(data = IncidentiPerMeseItalia, mapping = aes(x = Mese, y = Value)) +
 
 
 # Crea grafico con gli incidenti nei vari mesi filtrati per i tre anni simbolici (2001, 2011, 2021)
-ggplot(data = IncidentiPerMeseItalia %>% filter(TIME %in% c(2001, 2011, 2021)), 
-       mapping = aes(x = Mese, y = Value, color = TIME)) +
+ggplot(data = IncidentiPerMeseItalia %>% filter(Anno %in% c(2001, 2011, 2021)), 
+       mapping = aes(x = Mese, y = Value, color = Anno)) +
   geom_point() +
   xlab("Mese") +
   ylab("Numero incidenti")

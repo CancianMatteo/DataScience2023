@@ -10,18 +10,16 @@ output:
 
 ## Introduzione e domande
 
-Ho scelto di fare questa analisi per analizzare gli incidenti stradali in Italia.\
-Mi sono chiesto infatti quali variabili potesssero incidere positivamente o negativamente sulle possibilità di fare un incidente:
+Ho scelto di fare questa analisi per analizzare gli incidenti stradali in Italia. \
+Variabili che possono incidere su un incidente stradale:
 
--   Gli incidenti sono rapportati alla popolazione dell'area geografica?
+-   Popolazione dell'area geografica?
 
--   Gli incidenti sono rapportati al parco veicolare dell'area geografica?
+-   Parco veicolare dell'area geografica?
 
--   Ci sono più possibilità di fare un incidente ad una certa ora del giorno?
+-   Ora del giorno? Giorno della settimana? Mese dell'anno?
 
--   Ci sono più possibilità di fare incidenti certi giorni piuttosto che altri?
-
--   Il tipo di strada percorsa incide su determinati tipi di incidenti?
+-   Tipo di strada percorsa?
 
 
 
@@ -30,10 +28,10 @@ Mi sono chiesto infatti quali variabili potesssero incidere positivamente o nega
 Ho analizzato i dataset disponibili su internet di varie organizzazioni (ISTAT, MIT, ACI, OECD...).
 Alla fine ho deciso di prendere i dati dall'ISTAT dove erano più completi e affidabili.
 
-Ho estrapolato vari dataset riguardanti il parco veicolare, gli incidenti e la popolazione di dimensione molto variabile (da decine di righe a milioni).
-Quindi ho escluso tutte le cose inutili e li ho adattati alle mie necessità.
+Ho estrapolato vari dataset riguardanti il parco veicolare, gli incidenti e la popolazione di dimensione molto variabile (da decine di righe a milioni). \
+Quindi ho escluso le cose inutili e li ho adattati alle mie necessità.
 
-<!-- qui magari dopo aggiungici qualche immagine -->
+
 ```{r echo=FALSE, message=FALSE}
 source("ImportTidyTransform.R")
 ```
@@ -51,14 +49,17 @@ ggplot(data = RapportoIncidentiPopolazione, mapping = aes(x = Territorio, y = In
 ```
 
 
+Gli incidenti sono rapportati alla popolazione dell'area geografica? \
+Sì, come possiamo vedere da questi due grafici gli incidenti sono abbastanza collegabili alla popolazione.
 
 
 ```{r, fig.align='center', fig.width=9, fig.height=7, echo=FALSE, message=FALSE}
 ggplot(data = RapportoIncidentiPopolazione %>% filter(Anno==2021), mapping = aes(x = nPopolazione, y = nIncidenti)) +
   geom_point() +
+  geom_text(aes(label = Territorio), nudge_y = -0.02, size=3) + # Add the labels
   scale_x_log10() +
   scale_y_log10() +
-  geom_smooth(se = TRUE) +
+  geom_smooth() +
   xlab("N. Incidenti") +
   ylab("N. Popolazione")
 ```
@@ -78,6 +79,8 @@ source("MapProvIncidentiPopolazione.R")
    guides(color = guide_colorbar(title = "Valore"))
 ```
 
+Milano molto trafficata, ma non così tanti incidenti se rapportati alla popolazione. \
+Non si può dire lo stesso per Liguria, Toscana ed Emilia-Romagna...
 
 
 ## Incidenti in rapporto al parco veicolare per regione nel 2021
@@ -87,12 +90,15 @@ source("ggplotIncidentiParcoveicolare.R")
 
 ggplot(data = RapportoIncidentiVeicoli %>% filter(TIME==2021), mapping = aes(x = nVeicoli, y = nIncidenti)) +
   geom_point() +
+  geom_text(aes(label = Territorio), nudge_y = -0.02, size=3) + # Add the labels
   scale_x_log10() +
   scale_y_log10() +
   geom_smooth(se = TRUE) +
   xlab("N. Incidenti") +
-  ylab("N. Popolazione")
+  ylab("N. Veicoli")
 ```
+Gli incidenti sono rapportati al parco veicolare? \
+Sì, come possiamo vedere da questo grafico gli incidenti sono abbastanza collegabili al parco veicolare.
 
 
 ## Mappa incidenti in rapporto al parco veicolare per provincia nel 2021
@@ -107,7 +113,8 @@ source("MapProvIncidentiParcoveicolare.R")
    theme_void() + theme(legend.position = "none") +     # per togliere assi, ecc dal grafico
    guides(color = guide_colorbar(title = "Valore"))
 ```
-
+Possiamo vedere che i dati degli incidenti al Sud (soprattutto in Calabria e Campania) sembrano un po' ottimisti, probabilmente ciò è dato dalle ridotte segnalazioni alle Forze dell'Ordine. \
+Generalmente le zone costiere sono più incidentate dell'entroterra.
 
 
 ## Quantità di incidenti per fascia oraria
@@ -122,14 +129,15 @@ ggplot(data = IncidentiPerOrarioItalia %>% select(ORA, Value) %>% group_by(ORA),
   xlab("Fascia oraria") +
   ylab("Numero incidenti")
 ```
-
+Ci sono più possibilità di fare un incidente ad una certa ora del giorno? \
+Sì l'ora "maledetta" sono le 18, questo perché la gente ritorna dalla giornata lavorativa (stress e stanchezza) o va a fare commissioni, in questa fascia oraria le strade sono molto trafficate e pericolose. 
 
 ### Negli anni 2001, 2011 e 2021
 
 ```{r, fig.align='center', fig.width=8, fig.height=6, echo=FALSE, message=FALSE}
 # Crea grafico con gli incidenti nelle varie fascie orarie filtrati per i tre anni simbolici (2001, 2011, 2021)
-ggplot(data = IncidentiPerOrarioItalia %>% filter(TIME %in% c(2001, 2011, 2021)), 
-       mapping = aes(x = ORA, y = Value, color = TIME)) +
+ggplot(data = IncidentiPerOrarioItalia %>% filter(Anno %in% c(2001, 2011, 2021)), 
+       mapping = aes(x = ORA, y = Value, color = Anno)) +
   geom_point() +
   xlab("Fascia oraria") +
   ylab("Numero incidenti")
@@ -142,7 +150,6 @@ ggplot(data = IncidentiPerOrarioItalia %>% filter(TIME %in% c(2001, 2011, 2021))
 ```{r, fig.align='center', fig.width=7, fig.height=6, echo=FALSE, message=FALSE}
 # Riordina i giorni della settimana nel modo desiderato
 IncidentiPerGiornoItalia$Giorno.della.settimana = factor(IncidentiPerGiornoItalia$Giorno.della.settimana, levels = c("lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"))
-
 # Crea grafico con gli incidenti nei vari giorni della settimana (somma di tutti gli anni dal 2001 al 2021)
 ggplot(data = IncidentiPerGiornoItalia %>% select(Giorno.della.settimana, Value) %>% group_by(Giorno.della.settimana),
        mapping = aes(x = Giorno.della.settimana, y = Value)) +
@@ -150,7 +157,9 @@ ggplot(data = IncidentiPerGiornoItalia %>% select(Giorno.della.settimana, Value)
   xlab("Giorno della settimana") +
   ylab("Numero incidenti")
 ```
-
+Ci sono più possibilità di fare incidenti certi giorni della settimana? \
+Sì il giorno più atteso della settimana (venerdì) è anche quello in cui accadono più incidenti, anche questo dovuto all'alto traffico e alla stanchezza lavorativa. \
+La domenica è il giorno più tranquillo, molti stanno a casa.
 
 
 ## Quantità di incidenti per mese
@@ -165,14 +174,14 @@ ggplot(data = IncidentiPerMeseItalia, mapping = aes(x = Mese, y = Value)) +
   xlab("Mese") +
   ylab("Numero incidenti")
 ```
-
+Ci sono più possibilità di fare incidenti certi mesi dell'anno? \
+Sì, le possibilità sono un po' più alte nei mesi estivi/autunnali. Agosto è l'eccezione alla regola infatti gli incidenti sono più ridotti poiché molti sono in vacanza.
 
 ### Negli anni 2001, 2011 e 2021
-
 ```{r, fig.align='center', fig.width=9, fig.height=6, echo=FALSE, message=FALSE}
 # Crea grafico con gli incidenti nei vari mesi filtrati per i tre anni simbolici (2001, 2011, 2021)
-ggplot(data = IncidentiPerMeseItalia %>% filter(TIME %in% c(2001, 2011, 2021)), 
-       mapping = aes(x = Mese, y = Value, color = TIME)) +
+ggplot(data = IncidentiPerMeseItalia %>% filter(Anno %in% c(2001, 2011, 2021)), 
+       mapping = aes(x = Mese, y = Value, color = Anno)) +
   geom_point() +
   xlab("Mese") +
   ylab("Numero incidenti")
@@ -190,8 +199,11 @@ ggplot(data = IncidentiPerTipoStradaItalia, aes(x = "", y = ValoriPercentuali, f
   geom_bar(stat = "identity", width = 1) +
   coord_polar("y", start = 0) +
   theme_void() +
+  labs(fill = "Tipo di strada dell'incidente") +
   geom_text(aes(label = ValoriPercentuali), position = position_stack(vjust = 0.5))
 ```
+Il tipo di strada percorsa incide?
+Sì, come atteso le strade urbane sono molto pericolose (imprudenza, incroci pericolosi, pedoni...).
 
 
 ### Tipo di intersezione in cui è accaduto l'incidente
@@ -203,7 +215,9 @@ ggplot(data = IncidentiPerIntersezioneItalia, aes(x = "", y = ValoriPercentuali,
   theme_void() +
   geom_text(aes(label = ValoriPercentuali), position = position_stack(vjust = 0.5))
 ```
-Altro è un dato cumulativo di: rotatoria, dosso, pendenza, strettoia, galleria, passaggio a livello...
+*Altro è un dato cumulativo di: rotatoria, dosso, pendenza, strettoia, galleria, passaggio a livello... \
+Stupisce un po' l'alta percentuale di incidenti sui rettilinei, oltre il 40% (scarsa attenzione alla guida e imprudenza). \
+Come già noto anche gli incroci sono molto pericolosi.
 
 
 ### Natura dell'incidente
@@ -213,5 +227,20 @@ ggplot(data = IncidentiPerNaturaItalia, aes(x = "", y = ValoriPercentuali, fill 
   geom_bar(stat = "identity", width = 1) +
   coord_polar("y", start = 0) +
   theme_void() +
+  labs(fill = "Natura dell'incidente") +
   geom_text(aes(label = ValoriPercentuali), position = position_stack(vjust = 0.5))
 ```
+"Pochi" incidenti tra veicoli e pedoni (<10%) ma non vanno sottovalutati perché spesso sono fatali.
+
+
+## Conclusioni
+Sebbene nell'analisi degli incidenti non venissero considerati i turisti (che contribuiscono agli incidenti), il meteo e nemmeno gli incidenti "leggeri" (senza il coinvolgimento delle Forze dell'Ordine), si è comunque riusciti ad ottenere dei dati per lo più affidabili in tutti i grafici.
+
+Questo progetto mi è stato molto utile per ampliare le mie conoscenze sulla Data Science e per imparare ad usare R.
+Inoltre mi ha permesso di scoprire molti dati interessanti sull'incidentalità stradale in Italia.
+
+Sviluppi futuri (avendo più tempo):
+ 
+ - analisi più dettagliata dei veicoli;
+ 
+ - mortalità incidenti stradali.
